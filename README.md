@@ -47,7 +47,13 @@ Refresh the browser page to activate.
 
 > The `peerDependencies` warning printed during install is expected: `react` and the `@deepseek-ai/*` packages are provided by the host DSH runtime and do not need to be installed into the profile.
 
-To upgrade later: `dsh plugin --profile web update deepseek-balance`
+To upgrade a **tag-pinned** install, re-add with the new tag (the spec must change for pnpm to fetch a different version):
+
+```sh
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.1"
+```
+
+For a **branch-tracking** install (no `#tag`), `dsh plugin --profile web update deepseek-balance` pulls the latest.
 
 ### Option 2: Manual link
 
@@ -66,12 +72,23 @@ Then add the `cordis.patch.yml` entry as in Option 1.
 
 ## Uninstall
 
-1. Remove the `deepseek-balance` entry appended to `cordis.patch.yml`;
-2. Remove the node_modules link:
-   ```powershell
-   Remove-Item "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Recurse -Force
-   ```
-3. Refresh the browser page.
+For a git-dependency install, remove the dependency declaration and the installed files in one step, then drop the patch entry:
+
+```sh
+# 1. Remove the dependency (clears package.json declaration + node_modules)
+dsh plugin --profile web remove deepseek-balance
+
+# 2. Remove the patch entry from $DSH_HOME/profiles/web/cordis.patch.yml
+#    (delete the `- insert:` block that adds id: deepseek-balance)
+
+# 3. Refresh the browser page
+```
+
+For a manual-link install (Option 2), remove the entry from `cordis.patch.yml` and delete the link:
+
+```powershell
+Remove-Item "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Recurse -Force
+```
 
 ## Development
 
