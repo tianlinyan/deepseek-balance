@@ -21,11 +21,22 @@ The indicator is always evaluated in **Beijing time** (`Asia/Shanghai`) and is i
 - Tooltip on hover tells you whether it is currently peak or off-peak
 - Host half uses the Gateway **SRC fallback** (no generated Typert artifact); browser half is a hand-written bundle — **zero build steps**
 
+## Prerequisites
+
+Before installing, make sure **all** of these are true:
+
+| # | Prerequisite | How to check / fix |
+|---|---|---|
+| 1 | **`dsh` CLI is runnable** | `dsh --help` works in your terminal. `dsh` is **not** a global npm package — it may live under an `npx` cache (e.g. `%LOCALAPPDATA%\npm-cache\_npx\<hash>\node_modules\.bin\dsh`). Add that `.bin` to `PATH`, or run the full path / use `npx dsh ...` instead. |
+| 2 | **`pnpm` is installed** | `pnpm --version` works. `dsh plugin` calls `pnpm` internally; without it you get `'pnpm' is not recognized`. Install with `npm install -g pnpm` (note: `corepack enable` may fail with `EPERM` under an nvm-managed Node). |
+| 3 | **GitHub is reachable** | The install clones `git+https://github.com/...`. Restricted/sandboxed networks that block HTTPS will fail every step. |
+| 4 | **`DEEPSEEK_API_KEY` is configured** | See [Configuration](#configuration) — the plugin needs it at runtime, and it must survive a `dsh web` restart. |
+
 ## Installation
 
 ### Option 1: `dsh plugin` from GitHub (recommended)
 
-The package is distributed as a git dependency — no npm account or publish needed. Run from your DSH installation:
+The package is distributed as a git dependency — no npm account or publish needed:
 
 ```sh
 # Pin a released tag (recommended)
@@ -35,15 +46,17 @@ dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance
 dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git"
 ```
 
-Then append to `$DSH_HOME/profiles/web/cordis.patch.yml`:
+Then register the plugin in the profile's patch layer. **Do not append to the file**: a fresh `cordis.patch.yml` contains a single `[]` line, and appending a second YAML list after it is a syntax error. **Replace the `[]`** with the `- insert:` block:
 
 ```yaml
+# $DSH_HOME/profiles/web/cordis.patch.yml
+# (replace the existing `[]` with this — not append)
 - insert:
     - id: deepseek-balance
       name: 'deepseek-balance'
 ```
 
-Refresh the browser page to activate.
+Refresh the browser page to activate. No restart needed — the profile patch layer hot-reloads.
 
 > The `peerDependencies` warning printed during install is expected: `react` and the `@deepseek-ai/*` packages are provided by the host DSH runtime and do not need to be installed into the profile.
 
@@ -63,12 +76,36 @@ Link this package into the web profile's node_modules:
 New-Item -ItemType Junction -Path "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Target "<path-to-this-package>"
 ```
 
-Then add the `cordis.patch.yml` entry as in Option 1.
+Then set the `cordis.patch.yml` entry as in Option 1 (replace `[]`).
 
 ## Configuration
 
-- **API key**: shares the `DEEPSEEK_API_KEY` credential with your chat models (configured via the Models page or an environment variable) — no separate setup needed. The Host half resolves it live through `ctx.credentials` on every request, so a key change takes effect within 60 seconds.
-- Optional: replace `BALANCE_URL` in `lib/index.js` with a proxy address.
+**The plugin reads `DEEPSEEK_API_KEY` through `ctx.credentials` on every request** — the same seam your chat models use, so a key change takes effect within 60 seconds. The key must be present in the **process environment of the running `dsh web` service**. Configure it in one of these ways (highest priority first):
+
+| Source | Where | Survives `dsh web` restart? |
+|---|---|---|
+| Process environment | Set in the shell/system env **before launching `dsh web`** (e.g. `setx DEEPSEEK_API_KEY ...` or a system-level variable) | ✅ Yes |
+| `$DSH_HOME/.credentials.yaml` | `DEEPSEEK_API_KEY: sk-...` in this file | ✅ Yes |
+| Chat-model settings | The Models page (same credential your `deepseek-official` model uses) | ✅ Usually |
+
+> ⚠️ **Common pitfall**: if the key exists only in the shell that started `dsh web` (a temporary `export`), the balance call works until you restart the service — then the plugin shows `api-key-not-configured`. Prefer a **system-level environment variable** or `.credentials.yaml` so the key survives restarts.
+
+Optional: replace `BALANCE_URL` in `lib/index.js` with a proxy address.
+
+## Verification
+
+Two self-checks (no need to ask anyone):
+
+1. **UI**: open your DSH web GUI and refresh. Success = a `🟢/🔴 DeepSeek 余额: CNY xxx` line appears under the composer input.
+2. **Endpoint** (optional, host half only):
+
+   ```powershell
+   Invoke-WebRequest -Uri "http://127.0.0.1:3080/api/deepseekBalance/get" -Method Post `
+     -Body '{"type":"client-request","rpcId":"t","method":"deepseekBalance/get","payload":{"args":{}}}' `
+     -ContentType "application/json" -UseBasicParsing
+   ```
+
+   A response with `"ok":true` and a `balance_infos` array means the Host half is working.
 
 ## Uninstall
 
