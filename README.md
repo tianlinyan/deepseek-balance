@@ -80,15 +80,41 @@ Then set the `cordis.patch.yml` entry as in Option 1 (replace `[]`).
 
 ## Configuration
 
-**The plugin reads `DEEPSEEK_API_KEY` through `ctx.credentials` on every request** — the same seam your chat models use, so a key change takes effect within 60 seconds. The key must be present in the **process environment of the running `dsh web` service**. Configure it in one of these ways (highest priority first):
+### Required: `DEEPSEEK_API_KEY` environment variable
 
-| Source | Where | Survives `dsh web` restart? |
-|---|---|---|
-| Process environment | Set in the shell/system env **before launching `dsh web`** (e.g. `setx DEEPSEEK_API_KEY ...` or a system-level variable) | ✅ Yes |
-| `$DSH_HOME/.credentials.yaml` | `DEEPSEEK_API_KEY: sk-...` in this file | ✅ Yes |
-| Chat-model settings | The Models page (same credential your `deepseek-official` model uses) | ✅ Usually |
+The plugin **requires** the `DEEPSEEK_API_KEY` environment variable. It is read through `ctx.credentials` on every request — the same seam your chat models use — so a key change takes effect within 60 seconds. Without it, the plugin shows `api-key-not-configured`.
 
-> ⚠️ **Common pitfall**: if the key exists only in the shell that started `dsh web` (a temporary `export`), the balance call works until you restart the service — then the plugin shows `api-key-not-configured`. Prefer a **system-level environment variable** or `.credentials.yaml` so the key survives restarts.
+Set it as a **persistent** environment variable so it survives a `dsh web` restart:
+
+**Windows (user-level, recommended):**
+
+```powershell
+# Set for the current user (persists across restarts; avoid /M — system-level
+# variables are readable by every user/process on the machine)
+setx DEEPSEEK_API_KEY "sk-xxxx"
+
+# Restart dsh web (and any open terminal) so the new variable takes effect
+```
+
+**macOS / Linux:**
+
+```sh
+# Add to your shell profile (~/.zshrc or ~/.bashrc), then restart dsh web
+export DEEPSEEK_API_KEY="sk-xxxx"
+```
+
+> ⚠️ **Pitfall 1 — temporary export**: if the key exists only in the shell that launched `dsh web` (a one-off `export`), the balance works until you restart the service, then shows `api-key-not-configured`. Use a persistent variable.
+>
+> ⚠️ **Pitfall 2 — key security**: prefer a **user-level** variable over a **system-level** one (`setx /M`), and never commit the key into git or paste it into logs/screenshots. If it is ever exposed publicly, revoke and regenerate it in the DeepSeek platform.
+
+### Alternative: `$DSH_HOME/.credentials.yaml`
+
+Instead of an environment variable, you may add the key to DSH's credential file (written with user-only permissions):
+
+```yaml
+# $DSH_HOME/.credentials.yaml
+DEEPSEEK_API_KEY: sk-xxxx
+```
 
 Optional: replace `BALANCE_URL` in `lib/index.js` with a proxy address.
 
