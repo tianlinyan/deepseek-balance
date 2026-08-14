@@ -1,0 +1,67 @@
+{
+  "name": "deepseek-balance",
+  "version": "0.1.0",
+  "description": "DeepSeek account balance readout under the DSH web composer (conversation.composer.dock), with a Beijing-time peak-hour status dot (red 09:00-12:00 / 14:00-18:00, green otherwise). Host half: one TypertRemoteService exposing deepseekBalance/get over the Gateway SRC fallback. Browser half: a hand-written dock entry bundle.",
+  "keywords": [
+    "deepseek",
+    "dsh",
+    "deepseek-harness",
+    "balance",
+    "plugin",
+    "composer",
+    "dock"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tianlinyan/deepseek-balance.git"
+  },
+  "homepage": "https://github.com/tianlinyan/deepseek-balance",
+  "bugs": {
+    "url": "https://github.com/tianlinyan/deepseek-balance/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "lib/types/index.d.ts",
+    "lib/types/client/index.d.ts",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/client.js",
+    "prepack": "npm run check"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "@deepseek-ai/cordis": ">=0.1.0-rc.5",
+    "@deepseek-ai/dsh-credentials": ">=0.1.0-rc.5",
+    "@deepseek-ai/dsh-typert-protocol": ">=0.1.0-rc.5"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}
