@@ -23,12 +23,16 @@ The indicator is always evaluated in **Beijing time** (`Asia/Shanghai`) and is i
 
 ## Installation
 
-### Option 1: `dsh plugin` (recommended)
+### Option 1: `dsh plugin` from GitHub (recommended)
 
-Run from your DSH installation:
+The package is distributed as a git dependency — no npm account or publish needed. Run from your DSH installation:
 
 ```sh
-dsh plugin --profile web add deepseek-balance
+# Pin a released tag (recommended)
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.0"
+
+# Or track the latest main branch
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git"
 ```
 
 Then append to `$DSH_HOME/profiles/web/cordis.patch.yml`:
@@ -40,6 +44,10 @@ Then append to `$DSH_HOME/profiles/web/cordis.patch.yml`:
 ```
 
 Refresh the browser page to activate.
+
+> The `peerDependencies` warning printed during install is expected: `react` and the `@deepseek-ai/*` packages are provided by the host DSH runtime and do not need to be installed into the profile.
+
+To upgrade later: `dsh plugin --profile web update deepseek-balance`
 
 ### Option 2: Manual link
 
@@ -71,12 +79,21 @@ Then add the `cordis.patch.yml` entry as in Option 1.
 # Syntax check
 npm run check
 
-# Preview the package (without publishing)
+# Preview the package contents
 npm pack --dry-run
-
-# Publish (requires `npm login` first; the package name must be available on the registry)
-npm publish
 ```
+
+### Releasing
+
+This project is distributed as a **git dependency** (no npm publish):
+
+1. Tag a release and push it (along with the `main` branch):
+   ```sh
+   git tag vX.Y.Z
+   git push origin main
+   git push origin vX.Y.Z
+   ```
+2. Consumers install via `dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#vX.Y.Z"`.
 
 ### Structure
 
