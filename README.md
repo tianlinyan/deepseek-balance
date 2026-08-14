@@ -1,37 +1,37 @@
 # deepseek-balance
 
-DeepSeek 账户余额显示插件，用于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（DSH）Web GUI。
+A DeepSeek account balance readout plugin for the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) Web GUI.
 
-在编辑框（composer）下方的 dock 区域显示当前 DeepSeek 账户总余额，并带一个**高峰时段状态灯**（按北京时间判断）：
+Shows your current DeepSeek account **total balance** in the dock area below the composer (message input), together with a **peak-hour status dot** (evaluated in Beijing time):
 
 ```
 🟢/🔴 DeepSeek 余额: CNY 116.09 | 2 轮 · 161 步 | LLM 31m55s · ...
 ```
 
-- 🔴 **高峰时段**（北京时间 09:00–12:00、14:00–18:00，半开区间，12:00/18:00 整点不计入）
-- 🟢 **空闲时段**（其余时间）
+- 🔴 **Peak hours** (Beijing time 09:00–12:00 and 14:00–18:00, half-open intervals: 12:00 and 18:00 sharp are off-peak)
+- 🟢 **Off-peak hours** (everything else)
 
-指示灯始终以**北京时间**（`Asia/Shanghai`）为准，与浏览器/系统时区无关——无论你在哪个时区，判定结果一致。
+The indicator is always evaluated in **Beijing time** (`Asia/Shanghai`) and is independent of the browser/OS timezone — the result is identical no matter where you are.
 
-## 特性
+## Features
 
-- 只显示**总余额**（`total_balance`），简洁一行
-- 每 **60 秒**自动刷新，无需手动操作
-- 状态灯按 DeepSeek 官方峰谷定价通告的时段规则（[DeepSeek API 峰谷定价](https://www.ithome.com/0/989/418.htm)）
-- 悬停显示当前是高峰/空闲时段的提示
-- Host 端利用 Gateway **SRC fallback**，免生成 Typert 产物；浏览器半为手写 bundle，**零构建步骤**
+- Shows only the **total balance** (`total_balance`) on a single compact line
+- Auto-refreshes every **60 seconds** — no manual action needed
+- Status dot follows the peak-pricing windows from the official DeepSeek announcement ([DeepSeek API peak/off-peak pricing](https://www.ithome.com/0/989/418.htm))
+- Tooltip on hover tells you whether it is currently peak or off-peak
+- Host half uses the Gateway **SRC fallback** (no generated Typert artifact); browser half is a hand-written bundle — **zero build steps**
 
-## 安装
+## Installation
 
-### 方式一：`dsh plugin`（推荐）
+### Option 1: `dsh plugin` (recommended)
 
-在 DSH 安装目录执行：
+Run from your DSH installation:
 
 ```sh
 dsh plugin --profile web add deepseek-balance
 ```
 
-然后编辑 `$DSH_HOME/profiles/web/cordis.patch.yml`，追加：
+Then append to `$DSH_HOME/profiles/web/cordis.patch.yml`:
 
 ```yaml
 - insert:
@@ -39,63 +39,64 @@ dsh plugin --profile web add deepseek-balance
       name: 'deepseek-balance'
 ```
 
-刷新浏览器页面生效。
+Refresh the browser page to activate.
 
-### 方式二：手动链接
+### Option 2: Manual link
 
-将本包链接到 web profile 的 node_modules：
+Link this package into the web profile's node_modules:
 
 ```powershell
-New-Item -ItemType Junction -Path "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Target "<本包路径>"
+New-Item -ItemType Junction -Path "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Target "<path-to-this-package>"
 ```
 
-再按方式一追加 `cordis.patch.yml` 条目。
+Then add the `cordis.patch.yml` entry as in Option 1.
 
-## 配置
+## Configuration
 
-- **API key**：与聊天模型共用 `DEEPSEEK_API_KEY` 凭证（Models 页或环境变量配置），无需单独设置。Host 端每次请求通过 `ctx.credentials` 实时解析，key 变更后 60 秒内生效。
-- 可选：将 `lib/index.js` 中的 `BALANCE_URL` 替换为代理地址。
+- **API key**: shares the `DEEPSEEK_API_KEY` credential with your chat models (configured via the Models page or an environment variable) — no separate setup needed. The Host half resolves it live through `ctx.credentials` on every request, so a key change takes effect within 60 seconds.
+- Optional: replace `BALANCE_URL` in `lib/index.js` with a proxy address.
 
-## 卸载
+## Uninstall
 
-1. 删除 `cordis.patch.yml` 中追加的 `deepseek-balance` 条目；
-2. 移除 node_modules 链接：
+1. Remove the `deepseek-balance` entry appended to `cordis.patch.yml`;
+2. Remove the node_modules link:
    ```powershell
    Remove-Item "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Recurse -Force
    ```
-3. 刷新浏览器页面。
+3. Refresh the browser page.
 
-## 开发
+## Development
 
 ```sh
-# 语法检查
+# Syntax check
 npm run check
 
-# 打包预览（不发布）
+# Preview the package (without publishing)
 npm pack --dry-run
 
-# 发布（需先 npm login，包名需在 registry 可用）
+# Publish (requires `npm login` first; the package name must be available on the registry)
 npm publish
 ```
 
-### 结构
+### Structure
 
 ```
 deepseek-balance/
-├── package.json          # dsh.client 声明 + exports + peerDependencies
+├── package.json          # dsh.client declaration + exports + peerDependencies
 ├── lib/
-│   ├── index.js          # Host 半：DeepSeekBalanceService（免构建）
-│   ├── client.js         # 浏览器半：手写 dock 条目 bundle
-│   └── types/            # 类型声明
+│   ├── index.js          # Host half: DeepSeekBalanceService (no build step)
+│   ├── client.js         # Browser half: hand-written dock entry bundle
+│   └── types/            # Type declarations
+├── CHANGELOG.md
 ├── LICENSE
 └── README.md
 ```
 
-### 注意
+### Notes
 
-- **Peer 依赖**：`react`、`@deepseek-ai/cordis`、`@deepseek-ai/dsh-credentials`、`@deepseek-ai/dsh-typert-protocol` 由宿主 DSH 提供，声明为 `peerDependencies`，请勿打包进发布产物。
-- **端点命名空间**固定为 `deepseekBalance`；如与其他插件冲突，改 `lib/index.js` 中 `super(ctx, 'deepseekBalance')` 的 key 并同步 client 的 endpoint 字符串。
-- 本包为纯 JS，无构建步骤；`lib/types/*.d.ts` 仅供 TS 消费者参考。
+- **Peer dependencies**: `react`, `@deepseek-ai/cordis`, `@deepseek-ai/dsh-credentials`, and `@deepseek-ai/dsh-typert-protocol` are provided by the host DSH runtime and declared as `peerDependencies` — do not bundle them into the published artifact.
+- The **endpoint namespace** is fixed at `deepseekBalance`; if it collides with another plugin, change the key in `super(ctx, 'deepseekBalance')` in `lib/index.js` and update the endpoint string in the client bundle accordingly.
+- This package is plain JavaScript with no build step; `lib/types/*.d.ts` is provided for TypeScript consumers.
 
 ## License
 
