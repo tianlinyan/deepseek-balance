@@ -13,9 +13,11 @@ The status dot always follows **Beijing time** (`Asia/Shanghai`), independent of
 
 ## Quick start
 
+> Before proceeding, make sure all [Prerequisites](#prerequisites) are satisfied (`dsh` CLI, `pnpm`, GitHub access, configured `DEEPSEEK_API_KEY`).
+
 ```sh
 # 1. Install from GitHub (no npm account needed)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.0"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.2"
 
 # 2. Register the plugin — edit $DSH_HOME/profiles/web/cordis.patch.yml,
 #    REPLACING the existing `[]` with:
@@ -26,7 +28,17 @@ dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance
 # 3. Refresh the browser page (no restart needed — the patch layer hot-reloads)
 ```
 
-See [Prerequisites](#prerequisites) first, then [Installation](#installation) and [Configuration](#configuration) for the details.
+## Table of contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+- [Uninstall](#uninstall)
+- [Development](#development)
+- [License](#license)
 
 ## Features
 
@@ -55,30 +67,13 @@ The package is a git dependency — no npm account or publish needed:
 
 ```sh
 # Pin a released tag (recommended)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.0"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.2"
 
 # Or track the latest main branch
 dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git"
 ```
 
-Then register the plugin in the profile's patch layer. **Do not append**: a fresh `cordis.patch.yml` contains a single `[]` line, and appending a second YAML list after it is a syntax error. **Replace the `[]`** with:
-
-```yaml
-# $DSH_HOME/profiles/web/cordis.patch.yml — replace the existing `[]` with this
-- insert:
-    - id: deepseek-balance
-      name: 'deepseek-balance'
-```
-
-Refresh the browser page. The `peerDependencies` warning printed during install is expected: `react` and the `@deepseek-ai/*` packages come from the host DSH runtime.
-
-**Upgrading:**
-
-- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version):
-  ```sh
-  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.1"
-  ```
-- **Branch-tracking** install (no `#tag`) — `dsh plugin --profile web update deepseek-balance` pulls the latest.
+Then [register the plugin](#register-the-plugin). The `peerDependencies` warning printed during install is expected: `react` and the `@deepseek-ai/*` packages come from the host DSH runtime.
 
 ### Option 2: Manual link
 
@@ -88,7 +83,28 @@ Link this package into the web profile's node_modules:
 New-Item -ItemType Junction -Path "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Target "<path-to-this-package>"
 ```
 
-Then set the `cordis.patch.yml` entry as in Option 1 (replace `[]`).
+Then [register the plugin](#register-the-plugin) as in Option 1.
+
+### Register the plugin
+
+Applies to both install options. Add the plugin to the profile's patch layer. **Do not append**: a fresh `cordis.patch.yml` contains a single `[]` line, and appending a second YAML list after it is a syntax error. **Replace the `[]`** with:
+
+```yaml
+# $DSH_HOME/profiles/web/cordis.patch.yml — replace the existing `[]` with this
+- insert:
+    - id: deepseek-balance
+      name: 'deepseek-balance'
+```
+
+Refresh the browser page — the patch layer hot-reloads, no restart needed.
+
+### Upgrading
+
+- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.2`:
+  ```sh
+  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.2"
+  ```
+- **Branch-tracking** install (no `#tag`) — `dsh plugin --profile web update deepseek-balance` pulls the latest.
 
 ## Configuration
 
@@ -123,7 +139,9 @@ DEEPSEEK_API_KEY: sk-xxxx
 
 **Key security:** never commit the key into git, paste it into logs or screenshots, or share it in chat. If it is ever exposed publicly, revoke and regenerate it in the DeepSeek platform.
 
-Optional: replace `BALANCE_URL` in `lib/index.js` with a proxy address.
+### Optional: `BALANCE_URL` proxy
+
+Replace `BALANCE_URL` in `lib/index.js` with a proxy address.
 
 ## Verification
 
