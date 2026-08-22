@@ -4,7 +4,7 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [未发布]
+## [0.1.2] - 2026-08-22
 
 ### 变更
 
@@ -27,5 +27,6 @@
 - **浏览器半（`lib/client.js`）**：手写 `window.__ModuleLoader__.load` bundle，仅依赖平台模块 `react`，零构建步骤。
 - **独立发布**：包结构（`package.json` peerDependencies + `dsh.client` 声明 + `exports`）、类型声明（`lib/types/*.d.ts`）、MIT License、打包产物经 `npm pack` 验证。
 
+[0.1.2]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.2
 [0.1.1]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.1
 [0.1.0]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.0
