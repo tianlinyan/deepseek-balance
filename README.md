@@ -17,7 +17,7 @@ The status dot always follows **Beijing time** (`Asia/Shanghai`), independent of
 
 ```sh
 # 1. Install from GitHub (no npm account needed)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.2"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.3"
 
 # 2. Register the plugin — edit $DSH_HOME/profiles/web/cordis.patch.yml,
 #    REPLACING the existing `[]` with:
@@ -67,7 +67,7 @@ The package is a git dependency — no npm account or publish needed:
 
 ```sh
 # Pin a released tag (recommended)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.2"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.3"
 
 # Or track the latest main branch
 dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git"
@@ -100,9 +100,9 @@ Refresh the browser page — the patch layer hot-reloads, no restart needed.
 
 ### Upgrading
 
-- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.2`:
+- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.3`:
   ```sh
-  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.2"
+  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.3"
   ```
 - **Branch-tracking** install (no `#tag`) — `dsh plugin --profile web update deepseek-balance` pulls the latest.
 
@@ -141,7 +141,13 @@ DEEPSEEK_API_KEY: sk-xxxx
 
 ### Optional: `BALANCE_URL` proxy
 
-Replace `BALANCE_URL` in `lib/index.js` with a proxy address.
+Point the plugin at a proxy for the balance call by exporting `BALANCE_URL` as a **persistent** environment variable (same persistence rules as the API key above); it overrides the built-in `https://api.deepseek.com/user/balance` per request, so a change takes effect without restarting `dsh web`:
+
+```powershell
+setx BALANCE_URL "https://your-proxy.example/user/balance"
+```
+
+> Editing `BALANCE_URL` directly in `lib/index.js` still works, but is lost on a `dsh plugin` reinstall — prefer the environment variable.
 
 ## Verification
 
@@ -189,8 +195,11 @@ Remove-Item "$HOME\.dsh\profiles\web\node_modules\deepseek-balance" -Recurse -Fo
 
 ```sh
 npm run check          # syntax check
+npm test               # syntax check + regression/consistency tests (no deps)
 npm pack --dry-run     # preview package contents
 ```
+
+The tests in `test/` run with Node's built-in test runner (`node --test`) and need **no installed dependencies** — they guard the LICENSE encoding, the package/README/CHANGELOG version agreement, the client `loadBalance` signature, and the host/browser seams. CI runs `npm test` on push/PR (see `.github/workflows/ci.yml`).
 
 ### Releasing
 
@@ -213,6 +222,9 @@ deepseek-balance/
 │   ├── index.js          # Host half: DeepSeekBalanceService (no build step)
 │   ├── client.js         # Browser half: hand-written dock entry bundle
 │   └── types/            # Type declarations
+├── test/
+│   └── health.test.mjs   # Dependency-free regression/consistency tests (node:test)
+├── .github/workflows/ci.yml
 ├── CHANGELOG.md
 ├── LICENSE
 └── README.md

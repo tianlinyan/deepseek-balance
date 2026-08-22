@@ -9,6 +9,13 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 
+/** Credential reference name for the DeepSeek API key (same as the LLM adapter). */
+export declare const API_KEY_REF: 'DEEPSEEK_API_KEY'
+/** Public DeepSeek balance endpoint (overridable via the `BALANCE_URL` env var). */
+export declare const BALANCE_URL: string
+/** Request timeout for the upstream balance call, in milliseconds. */
+export declare const BALANCE_TIMEOUT_MS: number
+
 /** One balance info row from the DeepSeek user-balance API. */
 export interface DeepSeekBalanceInfo {
   /** ISO 4217 currency code, e.g. `CNY`. */

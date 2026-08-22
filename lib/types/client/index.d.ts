@@ -10,8 +10,11 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 
 /** Injected business face delivered to the dock entry component. */
 export interface BalanceDockInjected {
-  /** Call the Host `deepseekBalance/get` Remote through the Connection RPC. */
-  loadBalance: () => Promise<unknown>
+  /**
+   * Call the Host `deepseekBalance/get` Remote through the Connection RPC.
+   * @param signal - optional abort signal used to cancel a hung request.
+   */
+  loadBalance: (signal?: AbortSignal) => Promise<unknown>
 }
 
 /** The composer.dock entry component props (runtime kit + injected face). */

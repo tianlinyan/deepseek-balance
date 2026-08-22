@@ -4,6 +4,24 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### 修复
+
+- **LICENSE 由 UTF-16LE 转回 UTF-8（无 BOM）**：此前 LICENSE 带 UTF-16 BOM，会被文本工具与许可证识别/扫描误判为二进制或"无许可证文件"，现为标准的 UTF-8 文本。
+
+### 变更
+
+- **（宿主半 `lib/index.js`）`BALANCE_URL` 支持环境变量覆盖**：新增 `balanceUrl()`，按请求读取 `process.env.BALANCE_URL`，空/缺失回退内置端点，代理地址变更无需重启；README 配置节同步更新。
+- **（浏览器半 `lib/client.js`）`classifyCarrier` 更健壮**：新增 `looksLikeBalancePayload` 与 `classifyPayload`，同时接受 Gateway 返回的"已包装 `{ok, value|error}`"与"未包装的载荷"两种形状，避免未来网关改版时把成功误判为失败；并把非 `invocation-unavailable` 的已解析网关失败归类为确定性业务错误（直接提示），而 `invocation-unavailable`（端点认领竞态）仍走瞬态快速重试，不影响 v0.1.3 的启动竞态处理。
+- **（库 `lib/types`）补齐类型声明**：`index.d.ts` 声明 `API_KEY_REF` / `BALANCE_URL` / `BALANCE_TIMEOUT_MS`；`client/index.d.ts` 的 `loadBalance` 补上 `signal?: AbortSignal` 形参。
+
+### 开发
+
+- **引入无依赖回归/一致性测试**：新增 `test/health.test.mjs`（`node --test`），覆盖 LICENSE 编码、package/README/CHANGELOG 版本一致、`loadBalance` 签名、宿主导出 seam；`npm test` 现在 = 语法检查 + 测试。
+- **新增 `.github/workflows/ci.yml`**：在 push/PR 上对 Node 22/24 跑 `npm test`。
+- **仓库卫生**：`scratch/` 一次性调试脚本已从 git 追踪移除并加入 `.gitignore`，避免进入分发路径。
+
 ## [0.1.3] - 2026-08-22
 
 ### 修复
