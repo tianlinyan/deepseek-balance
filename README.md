@@ -17,7 +17,7 @@ The status dot always follows **Beijing time** (`Asia/Shanghai`), independent of
 
 ```sh
 # 1. Install from GitHub (no npm account needed)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.3"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.4"
 
 # 2. Register the plugin — edit $DSH_HOME/profiles/web/cordis.patch.yml,
 #    REPLACING the existing `[]` with:
@@ -67,7 +67,7 @@ The package is a git dependency — no npm account or publish needed:
 
 ```sh
 # Pin a released tag (recommended)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.3"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.4"
 
 # Or track the latest main branch
 dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git"
@@ -100,9 +100,9 @@ Refresh the browser page — the patch layer hot-reloads, no restart needed.
 
 ### Upgrading
 
-- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.3`:
+- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.4`:
   ```sh
-  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.3"
+  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.4"
   ```
 - **Branch-tracking** install (no `#tag`) — `dsh plugin --profile web update deepseek-balance` pulls the latest.
 
