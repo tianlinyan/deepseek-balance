@@ -1,7 +1,7 @@
 {
   "name": "deepseek-balance",
-  "version": "0.1.4",
-  "description": "DeepSeek account balance readout under the DSH web composer (conversation.composer.dock), with a Beijing-time peak-hour status dot (red 09:00-12:00 / 14:00-18:00, green otherwise). Host half: one TypertRemoteService exposing deepseekBalance/get over the Gateway SRC fallback. Browser half: a hand-written dock entry bundle.",
+  "version": "0.1.5",
+  "description": "DeepSeek account balance readout under the DSH web composer (conversation.composer.dock), with a Beijing-time peak-hour status dot (red 09:00-12:00 / 14:00-18:00 on weekdays, green on weekends and off-peak per the 2026-08-23 pricing change). Host half: one TypertRemoteService exposing deepseekBalance/get over the Gateway SRC fallback. Browser half: a hand-written dock entry bundle.",
   "keywords": [
     "deepseek",
     "dsh",

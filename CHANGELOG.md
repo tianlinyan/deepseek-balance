@@ -4,6 +4,13 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.5] - 2026-08-22
+
+### 变更
+
+- **（浏览器半 `lib/client.js`）高峰时段判定跟随 DeepSeek 最新峰谷计费规则**：自北京时间 2026-08-23（周日）00:00 起，周末（周六、周日）全天不再区分峰谷时段，统一按低谷时段价格计费。状态灯与悬停提示据此更新——周末整天保持 🟢（低谷时段），仅工作日（周一至周五）09:00–12:00、14:00–18:00 显示 🔴 高峰时段。新增 `isBeijingWeekend()`，判定仍以 `Asia/Shanghai` 时区为准，与浏览器/系统时区无关。
+- **（库 `package.json` / `README.md`）版本与说明同步**：版本升至 `0.1.5`，描述与 README 的高峰/低谷时段说明同步更新，README 安装/升级命令中的固定标签改为 `#v0.1.5`。
+
 ## [0.1.4] - 2026-08-22
 
 ### 修复
@@ -52,6 +59,7 @@
 - **浏览器半（`lib/client.js`）**：手写 `window.__ModuleLoader__.load` bundle，仅依赖平台模块 `react`，零构建步骤。
 - **独立发布**：包结构（`package.json` peerDependencies + `dsh.client` 声明 + `exports`）、类型声明（`lib/types/*.d.ts`）、MIT License、打包产物经 `npm pack` 验证。
 
+[0.1.5]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.5
 [0.1.4]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.4
 [0.1.3]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.3
 [0.1.2]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.2

@@ -6,8 +6,8 @@ A DeepSeek account balance readout plugin for the [DeepSeek Harness](https://git
 🟢/🔴 DeepSeek 余额: CNY 116.09 | 2 轮 · 161 步 | LLM 31m55s · ...
 ```
 
-- 🔴 **Peak hours** — Beijing time 09:00–12:00 and 14:00–18:00 (half-open intervals: 12:00 and 18:00 sharp are off-peak)
-- 🟢 **Off-peak hours** — everything else
+- 🔴 **Peak hours** — Beijing time 09:00–12:00 and 14:00–18:00 (half-open intervals: 12:00 and 18:00 sharp are off-peak). **Weekdays only.**
+- 🟢 **Off-peak hours** — everything else. **Weekends (Saturday/Sunday) are off-peak all day** — since the 2026-08-23 pricing change, peak/off-peak no longer applies on weekends; the whole day is billed at the off-peak (low-value) price, so the dot stays green.
 
 The status dot always follows **Beijing time** (`Asia/Shanghai`), independent of the browser/OS timezone — the result is identical anywhere in the world.
 
@@ -17,7 +17,7 @@ The status dot always follows **Beijing time** (`Asia/Shanghai`), independent of
 
 ```sh
 # 1. Install from GitHub (no npm account needed)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.4"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.5"
 
 # 2. Register the plugin — edit $DSH_HOME/profiles/web/cordis.patch.yml,
 #    REPLACING the existing `[]` with:
@@ -44,7 +44,7 @@ dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance
 
 - **Total balance only** (`total_balance`) on a single compact line
 - **Auto-refresh every 60 seconds** — nothing to click
-- **Peak-hour status dot** following the official DeepSeek peak-pricing windows ([announcement](https://www.ithome.com/0/989/418.htm))
+- **Peak-hour status dot** following the official DeepSeek peak-pricing windows ([announcement](https://www.ithome.com/0/989/418.htm)) — red only during weekday peak hours; weekends are off-peak all day
 - **Tooltip on hover** tells you whether it is currently peak or off-peak
 - **Zero build steps** — host half uses the Gateway SRC fallback (no generated Typert artifact); browser half is a hand-written bundle
 
@@ -67,7 +67,7 @@ The package is a git dependency — no npm account or publish needed:
 
 ```sh
 # Pin a released tag (recommended)
-dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.4"
+dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.5"
 
 # Or track the latest main branch
 dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git"
@@ -100,9 +100,9 @@ Refresh the browser page — the patch layer hot-reloads, no restart needed.
 
 ### Upgrading
 
-- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.4`:
+- **Tag-pinned** install — re-add with the new tag (the spec must change for pnpm to fetch a different version), e.g. bump `#v0.1.1` to `#v0.1.5`:
   ```sh
-  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.4"
+  dsh plugin --profile web add "git+https://github.com/tianlinyan/deepseek-balance.git#v0.1.5"
   ```
 - **Branch-tracking** install (no `#tag`) — `dsh plugin --profile web update deepseek-balance` pulls the latest.
 
