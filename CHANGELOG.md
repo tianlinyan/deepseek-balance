@@ -4,6 +4,13 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.3] - 2026-08-22
+
+### 修复
+
+- **取数生命周期脱离 React（浏览器半 `lib/client.js`）**：修复"刷新页面后余额长时间停留在'查询中…'"的问题。此前取数循环挂在组件 effect 上，页面加载后 slot 注入面身份变化（会话恢复、provider roster 变化导致的重新物化）会触发 effect 重跑，把刚显示的余额瞬间覆盖回"查询中…"并作废在途请求，可能持续 1 分钟以上。现改为**模块级单飞取数循环 + `useSyncExternalStore` 订阅**：循环与组件生命周期解耦，重挂载/重渲染只刷新最新注入面，不再重置视图；每次请求带 6 秒超时并 `AbortController` 中止悬挂请求；传输失败指数退避（3s→6s→12s→15s，阶梯重置）后台静默重试。
+- **上次余额本地缓存（`localStorage`）**：成功获取的余额持久化，刷新后**立即显示上次余额**（带"上次获取，后台刷新中"悬停提示），后台静默刷新，不再出现"查询中…"占位；缓存 24 小时内有效。业务性错误（如 API Key 未配置）仍即时显示，不会被缓存掩盖。
+
 ## [0.1.2] - 2026-08-22
 
 ### 变更
@@ -27,6 +34,7 @@
 - **浏览器半（`lib/client.js`）**：手写 `window.__ModuleLoader__.load` bundle，仅依赖平台模块 `react`，零构建步骤。
 - **独立发布**：包结构（`package.json` peerDependencies + `dsh.client` 声明 + `exports`）、类型声明（`lib/types/*.d.ts`）、MIT License、打包产物经 `npm pack` 验证。
 
+[0.1.3]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.3
 [0.1.2]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.2
 [0.1.1]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.1
 [0.1.0]: https://github.com/tianlinyan/deepseek-balance/releases/tag/v0.1.0
